@@ -3,7 +3,7 @@ import { BehaviorSubject } from "rxjs";
 
 export class Bot {
   #targetUrl;
-  #refreshInterval = 5 * 1000;
+  #refreshInterval = 15 * 1000;
   #refreshIntervalId;
 
   browser;
@@ -56,9 +56,9 @@ export class Bot {
     console.log(`devlog: startScraping`);
 
     this.scrapStrategy();
-    this.#refreshIntervalId = setInterval(
-      () => this.scrapStrategy(),
-      this.#refreshInterval
-    );
+    this.#refreshIntervalId = setInterval(async () => {
+      await this.page.reload({ ignoreCache: true });
+      this.scrapStrategy();
+    }, this.#refreshInterval);
   }
 }
