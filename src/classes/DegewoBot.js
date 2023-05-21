@@ -1,5 +1,4 @@
 import { Bot } from "./Bot.js";
-import { BehaviorSubject } from "rxjs";
 
 export class DegewoBot extends Bot {
   constructor(params) {
@@ -15,10 +14,12 @@ export class DegewoBot extends Bot {
         articles.forEach((article) => {
           const meta = article.querySelector(".article__meta");
           const title = article.querySelector(".article__title");
+          const url = article.querySelector("a").href;
 
           const data = {
             meta: meta ? meta.innerText : "",
             title: title ? title.innerText : "",
+            url: url ? url : "",
           };
 
           extractedData.push(data);

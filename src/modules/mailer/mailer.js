@@ -11,14 +11,14 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const mailOptions = {
-  from: process.env.GMAIL_USERNAME,
-  to: "kevin.kuehle@googlemail.com",
-  subject: "Hello from Node.js",
-  text: "This is a test email sent from Node.js using nodemailer.",
-};
+export function sendMail(data) {
+  const mailOptions = {
+    from: process.env.GMAIL_USERNAME,
+    to: "kevin.kuehle@googlemail.com",
+    subject: "🛣️ Degewo Neue Anzeige mit Waldsassener Straße!",
+    text: data,
+  };
 
-export function sendMail() {
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.log("Error:", error);
@@ -26,4 +26,19 @@ export function sendMail() {
       console.log("Email sent:", info.response);
     }
   });
+}
+
+export function arrayToContent(arrayData) {
+  const content = arrayData.map((item) => {
+    let line1 = `Title: ${item.title}\n`;
+    let line2 = `Meta: ${item.meta}\n`;
+    let line3 = `Link: ${item?.url || "no url"}\n`;
+    let breakLine = `------------------------\n`;
+
+    return line1 + line2 + line3 + breakLine;
+  });
+
+  console.log(`devlog: content`, content.join(" "));
+
+  return content.join(" ");
 }

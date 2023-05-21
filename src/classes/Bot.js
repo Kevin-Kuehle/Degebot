@@ -19,7 +19,7 @@ export class Bot {
   async run() {
     try {
       // starten wir den Browser
-      this.browser = await puppeteer.launch({ headless: false });
+      this.browser = await puppeteer.launch({ headless: true });
       this.page = await this.browser.newPage();
       this.page.setDefaultNavigationTimeout(2 * 60 * 1000);
       await this.page.goto(this.#targetUrl);
