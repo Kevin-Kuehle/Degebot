@@ -11,12 +11,12 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export function sendMail(data) {
+export function sendMail(title, targetMail, content) {
   const mailOptions = {
     from: process.env.GMAIL_USERNAME,
-    to: "kevin.kuehle@googlemail.com",
-    subject: "🛣️ Degewo Neue Anzeige mit Waldsassener Straße!",
-    text: data,
+    to: targetMail,
+    subject: title,
+    text: content,
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
@@ -32,13 +32,11 @@ export function arrayToContent(arrayData) {
   const content = arrayData.map((item) => {
     let line1 = `Title: ${item.title}\n`;
     let line2 = `Meta: ${item.meta}\n`;
-    let line3 = `Link: ${item?.url || "no url"}\n`;
+    let line3 = `Link: ${item.url}\n` || "no link";
     let breakLine = `------------------------\n`;
 
-    return line1 + line2 + line3 + breakLine;
+    return line1 + line2 + line3 + "\n\n" + breakLine;
   });
-
-  console.log(`devlog: content`, content.join(" "));
 
   return content.join(" ");
 }

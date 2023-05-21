@@ -37,6 +37,7 @@ export class Bot {
     return Promise.resolve();
   }
   async restart() {
+    console.log(`devlog: restart bot`);
     await this.stop();
     await this.run();
     this.startScraping();
