@@ -1,12 +1,13 @@
 import { Bot } from "./Bot.js";
 
 export class DegewoBot extends Bot {
-  constructor(params) {
-    super(params);
+  constructor(params, config) {
+    super(params, config);
   }
 
   async scrapStrategy() {
     if (this.page) {
+      console.log(`devlog: start scraping: +++ ${this.name}`);
       const myData = await this.page.evaluate(() => {
         const articles = document.querySelectorAll(".article-list__item");
         const extractedData = [];

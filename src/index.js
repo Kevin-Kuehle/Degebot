@@ -1,5 +1,3 @@
-import { run } from "./modules/puppeteer/puppeteer.js";
-import { Bot } from "./classes/Bot.js";
 import { DegewoBot } from "./classes/DegewoBot.js";
 import { sendMail, arrayToContent } from "./modules/mailer/mailer.js";
 import { DataChecker } from "./classes/DataChecker.js";
@@ -9,9 +7,9 @@ const target =
 
 async function main() {
   try {
-    const degewoBot = new DegewoBot(target);
+    const degewoBot = new DegewoBot(target, { name: "DegewoBot" });
 
-    const b = await degewoBot.run(target);
+    const b = await degewoBot.runProxy();
 
     const bConfig = {
       compareAttr: ["title", "meta"],
@@ -33,11 +31,11 @@ async function main() {
 
     degewoBot.startScraping();
   } catch (error) {
-    sendMail(
-      "🛣️ 🔴 Degewo Bot Error",
-      "kevin.kuehle@gmail.com",
-      `🛣️ Degewo Bot Error  ${error} `
-    );
+    // sendMail(
+    //   "🛣️ 🔴 Degewo Bot Error",
+    //   "kevin.kuehle@gmail.com",
+    //   `🛣️ Degewo Bot Error  ${error} `
+    // );
   }
 }
 main();
