@@ -7,20 +7,26 @@ const target =
 
 async function main() {
   try {
-    const degewoBot = new DegewoBot(target, { name: "DegewoBot" });
+    const degewoBot = new DegewoBot(target, {
+      name: "DegewoBot",
+      refreshInterval: 120 * 60 * 1000,
+    });
 
-    const b = await degewoBot.runProxy();
+    const onDegewoChanges$ = await degewoBot.run();
 
-    const bConfig = {
+    const configDataCheckerDegewo = {
       compareAttr: ["title", "meta"],
-      blacklist: ["Motorrad Stellplatz"],
-      searchRegex: /waldsassener\sstrasse/i,
+      blacklist: ["Motorrad Stellplatz", "Motorradstellplatz", "Motorrad"],
+      searchRegex:
+        /\b(Waldsassener\sStraße|Waldsassener\sstrasse|Waldsassener|Tirschenreuther\sRing|Tirschenreutherring)\b/gi,
     };
 
-    const bChecker = new DataChecker(bConfig);
-    b.subscribe(async (data) => {
-      const foundItem = await bChecker.check(data);
+    const degewoDataChecker = new DataChecker(configDataCheckerDegewo);
+
+    onDegewoChanges$.subscribe(async (data) => {
+      const foundItem = await degewoDataChecker.check(data);
       if (foundItem.length > 0) {
+        console.log(`devlog: data`, data);
         sendMail(
           "🛣️ Degewo Neue Anzeige mit Waldsassener Straße!",
           "kevin.kuehle@gmail.com",

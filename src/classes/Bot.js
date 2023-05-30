@@ -7,7 +7,7 @@ dotenv.config();
 
 export class Bot {
   #targetUrl;
-  #refreshInterval = 15 * 1000;
+  #refreshInterval = 15 * 60 * 1000;
   #refreshIntervalId;
   browser;
   page;
@@ -17,8 +17,8 @@ export class Bot {
   constructor(targetUrl, config = {}) {
     this.#targetUrl = targetUrl;
     this.#refreshInterval = config.refreshInterval || this.#refreshInterval;
-    this.data = new BehaviorSubject([]);
     this.#name = config.name || "default Bot";
+    this.data = new BehaviorSubject([]);
   }
 
   get name() {
@@ -97,12 +97,24 @@ export class Bot {
   }
 
   startScraping() {
-    console.log(`${this.#name} startScraping`);
-
+    console.log(`${this.name} ${this.date} start scraping...`);
     this.scrapStrategy();
     this.#refreshIntervalId = setInterval(async () => {
       await this.page.reload({ ignoreCache: true });
+      console.log(`${this.name} ${this.date} refresh scraping...`);
       this.scrapStrategy();
     }, this.#refreshInterval);
+  }
+
+  get date() {
+    const date = new Date();
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const seconds = date.getSeconds();
+
+    return `${day}.${month}.${year} ${hours}:${minutes}:${seconds}`;
   }
 }
