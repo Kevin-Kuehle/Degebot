@@ -1,20 +1,18 @@
 import { DegewoBot } from "./classes/DegewoBot.js";
 import { sendMail, arrayToContent } from "./modules/mailer/mailer.js";
 import { DataChecker } from "./classes/DataChecker.js";
-import {
-  connectToDatabase,
-  addToDatabase,
-} from "./modules/database/database.js";
+import { connectToDatabase, degewoDBAdd } from "./modules/database/database.js";
 
 const target =
   "https://immosuche.degewo.de/de/search?size=1&page=1&property_type_id=1&categories%5B%5D=16&lat=&lon=&area=&address%5Bstreet%5D=&address%5Bcity%5D=&address%5Bzipcode%5D=&address%5Bdistrict%5D=&district=60&property_number=&price_switch=false&price_radio=null&price_from=&price_to=&qm_radio=null&qm_from=&qm_to=&rooms_radio=null&rooms_from=&rooms_to=&wbs_required=&order=rent_total_without_vat_asc";
 
 async function main() {
   try {
-    // connectToDatabase("degewo");
-    // setInterval(() => {
-    //   addToDatabase("degewo", { title: "test" });
-    // }, 15000);
+    await connectToDatabase();
+
+    setTimeout(() => {
+      degewoDBAdd({ title: "test", meta: "test" });
+    }, 15000);
 
     const degewoBot = new DegewoBot(target, {
       name: "DegewoBot",

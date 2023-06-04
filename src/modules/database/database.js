@@ -1,19 +1,18 @@
 // mongodb
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import { DegewoModel } from "./../../models/index.js";
 
 dotenv.config();
 
 let db = null;
 
-export async function connectToDatabase(databaseName) {
+export async function connectToDatabase() {
   try {
-    // connect to mongodb
+    if (db) return Promise.resolve("Database already connected");
 
     const databaseUrl = `mongodb://${process.env.DATABASE_USER}:${process.env.DATABASE_PW}@${process.env.DATABASE_HOST}:${process.env.DATABASE_PORT}`;
-    console.log(`devlog: try to connect to database: ${databaseUrl}`);
 
-    if (db) return Promise.resolve();
     mongoose.connect(databaseUrl, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -25,16 +24,23 @@ export async function connectToDatabase(databaseName) {
     db.on("error", console.error.bind(console, "connection error:"));
     db.once("open", () => {
       console.log("Database connected");
-      return Promise.resolve();
+      return Promise.resolve("Database connected");
     });
   } catch (error) {
-    // disconnect from mongodb
     mongoose.disconnect();
     console.log(`database ERROR: `, error);
   }
 }
 
-export function addToDatabase(databaseName, data) {
-  const collection = db.collection(databaseName);
-  collection.insertOne(data);
+export function degewoDBAdd(data) {
+  const degewo = new DegewoModel(data);
+
+  degewo
+    .save()
+    .then(() => {
+      console.log("saved to database");
+    })
+    .catch((err) => {
+      console.log("error saving to database", err);
+    });
 }
