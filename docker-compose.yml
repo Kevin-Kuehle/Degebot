@@ -1,14 +1,14 @@
 version: "2.17.2"
 services:
-  app:
-    build: .
-    ports:
-      - "3000:3000"
-    volumes:
-      - .:/app
-    depends_on:
-      - mongo
-      - mongo-express
+  # app:
+  #   build: .
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - .:/app
+  #   depends_on:
+  #     - mongo
+  #     - mongo-express
   mongo:
     image: "mongo"
     ports:
@@ -17,14 +17,15 @@ services:
     volumes:
       - "./mongo_data:/data/db"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_ROOT_USERNAME: kkuehle
+      MONGO_INITDB_ROOT_PASSWORD: adminpw
+      MONGO_INITDB_DATABASE: admin
   mongo-express:
     image: mongo-express
     ports:
       - "8081:8081"
     restart: always
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+      ME_CONFIG_MONGODB_ADMINUSERNAME: kkuehle
+      ME_CONFIG_MONGODB_ADMINPASSWORD: adminpw
+      ME_CONFIG_MONGODB_URL: mongodb://kkuehle:adminpw@mongo:27017

@@ -1,5 +1,4 @@
 import mongoose, { Schema } from "mongoose";
-import { timestamp } from "rxjs";
 
 const degewoSchema = new Schema(
   {

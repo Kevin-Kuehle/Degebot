@@ -5,42 +5,74 @@ import { DegewoModel } from "./../../models/index.js";
 
 dotenv.config();
 
-let db = null;
+let adminDB = null;
 
-export async function connectToDatabase() {
+export async function initConnection(databaseName) {
+  return new Promise((resolve, reject) => {
+    try {
+      console.log(`devlog: init Database`);
+      // create connection url
+      const databaseUrl = `mongodb://${process.env.DATABASE_USER}:${process.env.DATABASE_PW}@${process.env.DATABASE_HOST}:${process.env.DATABASE_PORT}?authSource=admin`;
+
+      // connect as admin
+      adminDB = mongoose.createConnection(databaseUrl, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        maxPoolSize: 10,
+      });
+
+      adminDB.on("error", (error) => {
+        console.log(`Database error: `, error);
+        mongoose.disconnect();
+      });
+
+      adminDB.on("connected", () => {
+        console.log(`Database connected`);
+        return resolve();
+      });
+    } catch (error) {
+      mongoose.disconnect();
+      reject(error);
+    }
+  });
+}
+
+// export function createCollection(databaseName, model, data) {}
+
+export async function createDatabase(databaseName) {
+  console.log(`devlog: createDatabase: ${databaseName}`);
+
+  await adminDB.db.admin().command({ create: databaseName });
+}
+
+export async function databaseExist(databaseName) {
   try {
-    if (db) return Promise.resolve("Database already connected");
-
-    const databaseUrl = `mongodb://${process.env.DATABASE_USER}:${process.env.DATABASE_PW}@${process.env.DATABASE_HOST}:${process.env.DATABASE_PORT}`;
-
-    mongoose.connect(databaseUrl, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      maxPoolSize: 10,
-    });
-
-    db = mongoose.connection;
-
-    db.on("error", console.error.bind(console, "connection error:"));
-    db.once("open", () => {
-      console.log("Database connected");
-      return Promise.resolve("Database connected");
-    });
+    const Admin = mongoose.mongo.Admin;
+    let databases = await new Admin(adminDB.db).listDatabases();
+    const exist = databases.databases.some((db) => db.name === databaseName);
+    return Promise.resolve(exist);
   } catch (error) {
-    mongoose.disconnect();
-    console.log(`database ERROR: `, error);
+    throw new Error(error);
   }
 }
 
-export function degewoDBAdd(data) {
-  const degewo = new DegewoModel(data);
+export async function createCollection(database, model, data) {
+  try {
+    const db = await adminDB.useDb(database);
+    const collection = db.model(model.modelName, model.schema);
+    await collection.insertMany(data);
+  } catch (error) {
+    throw new Error(error);
+  }
+}
 
-  degewo
-    .save()
-    .then(() => {
-      console.log("saved to database");
-    })
-    .catch((err) => {
-      console.log("error saving to database", err);
-    });
+export async function addData(database, data) {
+  try {
+    // use connection pool from adminDB
+    const db = adminDB.useDb(database);
+    const model = db.model("dingdong", new mongoose.Schema({ name: String }));
+    model.create({ name: "audi" });
+  } catch (error) {
+    console.log(`devlog: error`, error);
+  }
 }

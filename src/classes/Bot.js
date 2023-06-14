@@ -1,6 +1,18 @@
 import puppeteer from "puppeteer";
 import { default as puppeteerCore } from "puppeteer-core";
 import { BehaviorSubject } from "rxjs";
+import {
+  addData,
+  createDatabase,
+  createCollection,
+  databaseExist,
+} from "./../modules/database/database.js";
+
+import {
+  BotMetaModel,
+  BotBlacklistModel,
+  BotConfigModel,
+} from "./../models/bot.model.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -19,6 +31,7 @@ export class Bot {
     this.#refreshInterval = config.refreshInterval || this.#refreshInterval;
     this.#name = config.name || "default Bot";
     this.data = new BehaviorSubject([]);
+    this.initDatabase();
   }
 
   get name() {
@@ -117,4 +130,34 @@ export class Bot {
 
     return `${day}.${month}.${year} ${hours}:${minutes}:${seconds}`;
   }
+
+  async initDatabase() {
+    console.log(`devlog: init database...`);
+    // check if database exists
+
+    const exist = await databaseExist(this.#name);
+    if (!exist) {
+      console.log(`devlog: database not exist.`);
+
+      const data = {
+        name: "audi",
+      };
+
+      await createCollection(this.#name, BotMetaModel, this.#metaInitData);
+      await createCollection(this.#name, BotBlacklistModel);
+      await createCollection(this.#name, BotConfigModel);
+    }
+
+    // if not create database
+    // create collections
+  }
+
+  get #metaInitData() {
+    return {
+      name: this.#name,
+      version: "0.0.1",
+    };
+  }
+
+  async addData(data) {}
 }
